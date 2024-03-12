@@ -33,6 +33,22 @@ func savePasswords(passwords []Password) error {
 }
 
 func loadPasswords() ([]Password, error) {
+	_, err := os.Stat(filename)
+
+	if os.IsNotExist(err) {
+		// File does not exists, create an empty file
+		_, err := os.Create(filename)
+		if err != nil {
+			return nil, err
+		}
+
+		return []Password{}, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, err
