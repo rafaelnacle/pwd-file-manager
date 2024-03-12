@@ -79,9 +79,21 @@ func main() {
 		for _, pw := range passwordsList {
 			fmt.Printf("Website: %s, Username: %s, Password: %s\n", pw.Website, pw.Username, pw.Password)
 		}
+	case "help":
+		printUsage()
+		os.Exit(1)
 	default:
 		fmt.Println("Unknown command:", os.Args[1])
 		fmt.Println("Usage: pwd-manager <command>")
 		os.Exit(1)
 	}
+}
+
+func printUsage() {
+	fmt.Println("Usage: pwd-manager <command>")
+	fmt.Println("Available commands:")
+	fmt.Println("  add    : Add a new password")
+	fmt.Println("  edit   : Edit an existing password")
+	fmt.Println("  delete : Delete a password")
+	fmt.Println("  list   : List all passwords")
 }
