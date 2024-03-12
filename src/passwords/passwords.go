@@ -2,6 +2,7 @@ package passwords
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 )
 
@@ -13,7 +14,7 @@ type Password struct {
 
 const filename = "passwords.json"
 
-func savePasswords(passwords []Password, filename string) error {
+func savePasswords(passwords []Password) error {
 	file, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -31,7 +32,7 @@ func savePasswords(passwords []Password, filename string) error {
 	return nil
 }
 
-func loadPassword(filename string) ([]Password, error) {
+func loadPasswords() ([]Password, error) {
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, err
@@ -45,4 +46,57 @@ func loadPassword(filename string) ([]Password, error) {
 	}
 
 	return passwords, nil
+}
+
+func AddPassword(website, username, password string) error {
+	passwords, err := loadPasswords()
+	if err != nil {
+		return err
+	}
+
+	newPassword := Password{Website: website, Username: username, Password: password}
+	passwords = append(passwords, newPassword)
+
+	return savePasswords(passwords)
+}
+
+func EditPassword(website, username, password string) error {
+	passwords, err := loadPasswords()
+	if err != nil {
+		return err
+	}
+
+	for i, pw := range passwords {
+		if pw.Website == website {
+			if username != "" {
+				passwords[i].Username = username
+			}
+			if password != "" {
+				passwords[i].Password = password
+			}
+			return savePasswords(passwords)
+		}
+	}
+
+	return fmt.Errorf("password not found for website %s", website)
+}
+
+func DeletePassword(website string) error {
+	passwords, err := loadPasswords()
+	if err != nil {
+		return err
+	}
+
+	for i, pw := range passwords {
+		if pw.Website == website {
+			passwords = append(passwords[:i], passwords[i+1:]...)
+			return savePasswords(passwords)
+		}
+	}
+
+	return fmt.Errorf("password not found for website %s", website)
+}
+
+func ListPasswords() ([]Password, error) {
+	return loadPasswords()
 }
